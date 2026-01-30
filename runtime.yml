@@ -1,0 +1,31 @@
+- hosts: app_servers
+  become: yes
+  tasks:
+    - name: Install base packages
+      apt:
+        name:
+          - curl
+          - git
+        update_cache: yes
+
+    - name: Add NodeSource repository (Node.js 18 LTS)
+      shell: |
+        curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+      args:
+        executable: /bin/bash
+
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Install PM2 globally
+      npm:
+        name: pm2
+        global: yes
+
+    - name: Setup PM2 startup for ubuntu user
+      shell: |
+        pm2 startup systemd -u ubuntu --hp /home/ubuntu
+      args:
+        executable: /bin/bash

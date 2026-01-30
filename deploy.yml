@@ -1,0 +1,47 @@
+- hosts: app_servers
+  become: yes
+  vars:
+    app_dir: /home/ubuntu/app
+    repo_url: https://github.com/mujaddidsi/devops-test-app.git
+    app_name: devops-test-app
+    app_entry: index.js
+    app_port: 3000
+
+  tasks:
+    - name: Ensure app directory exists
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Clone application repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: main
+        force: yes
+      become_user: ubuntu
+
+    - name: Install npm dependencies
+      npm:
+        path: "{{ app_dir }}"
+        production: yes
+      become_user: ubuntu
+
+    - name: Stop app if already running
+      shell: pm2 delete "{{ app_name }}"
+      ignore_errors: yes
+      become_user: ubuntu
+
+    - name: Start app with PM2
+      shell: pm2 start "{{ app_entry }}" --name "{{ app_name }}"
+      args:
+        chdir: "{{ app_dir }}"
+      environment:
+        PORT: "{{ app_port }}"
+      become_user: ubuntu
+
+    - name: Save PM2 process list
+      shell: pm2 save
+      become_user: ubuntu
