@@ -1,3 +1,5 @@
+# Part A
+
 # Ansible Setup – DevOps Technical Test
 
 ## Overview
@@ -51,3 +53,15 @@ ansible.cfg     # Ansible configuration
 inventory.ini   # Inventory definition
 runtime.yml     # Runtime setup (Node.js, PM2)
 deploy.yml      # Application deployment via PM2
+
+
+---
+
+## Part C
+
+Basic application visibility is provided using PM2 logs for the VM-based deployment.
+
+PM2 automatically manages and stores application logs, which can be accessed using:
+
+```bash
+pm2 logs
